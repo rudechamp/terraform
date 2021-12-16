@@ -5,7 +5,18 @@ provider "aws" {
 }
 
 provider "template" {
-  version = "~> 2.1.2"
+  #version = "~> 2.1.2"
 }
 
+terraform {
+  required_providers {
+    nginx = {
+      source  = "getstackhead/nginx"
+      version = "1.3.2"
+    }
+  }
+}
 
+provider "nginx" {
+  # Configuration options
+}

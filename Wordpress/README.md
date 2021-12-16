@@ -37,5 +37,4 @@ provisioning:
 
 Destroying:
 ---------------------
-1. cd terraform-aws-wordpress (Be in the repo directory)
-2. terraform destroy -auto-approve
+1. terraform destroy -auto-approve
