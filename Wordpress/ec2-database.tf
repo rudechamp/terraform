@@ -51,17 +51,6 @@ resource "aws_instance" "ec2" {
   }
 
   provisioner "file" {
-    source      = "files/wordpress.conf"
-    destination = "/tmp/wordpress.conf"
-    connection {
-      type        = "ssh"
-      user        = "ubuntu"
-      host        = self.public_ip
-      private_key = file(var.ssh_priv_key)
-    }
-  }
-
-  provisioner "file" {
     source      = "files/userdata.sh"
     destination = "/tmp/userdata.sh"
 
@@ -101,8 +90,34 @@ resource "aws_instance" "ec2" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo cp /tmp/wp-config.php /var/www/html/wp-config.php",
-     ]
+      "sudo cp /tmp/wp-config.php /var/www/html/wordpress/wp-config.php",
+    ]
+
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      host        = self.public_ip
+      private_key = file(var.ssh_priv_key)
+    }
+  }
+  
+
+  provisioner "file" {
+    source      = "files/test.conf"
+    destination = "/tmp/test.conf"
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      host        = self.public_ip
+      private_key = file(var.ssh_priv_key)
+    }
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo cp /tmp/test.conf /etc/nginx/sites-available/test.conf",
+      "sudo ln -s /etc/nginx/sites-available/test.conf /etc/nginx/sites-enabled/",
+    ]
 
     connection {
       type        = "ssh"
@@ -132,3 +147,49 @@ data "aws_ami" "ubuntu" {
 
   owners = ["099720109477"] # Canonical
 }
+
+# This will create file /etc/nginx/sites-available/test.conf and symlink /etc/nginx/sites-enabled/test.conf
+#resource "nginx_server_block" "ec2" {
+#  filename = "test.conf"
+#  enable   = true
+#  content  = <<EOF
+#server {
+#            listen 80;
+#            root /var/www/html/wordpress/public_html;
+#            index index.php index.html;
+#            server_name test.wordpress;
+
+#	    access_log /var/log/nginx/wordpress.access.log;
+#    	    error_log /var/log/nginx/wordpress.error.log;
+
+#            location / {
+#                         try_files $uri $uri/ =404;
+#            }
+
+#            location ~ \.php$ {
+#                         include snippets/fastcgi-php.conf;
+#                         fastcgi_pass unix:/run/php/php7.2-fpm.sock;
+#            }
+
+#            location ~ /\.ht {
+#                         deny all;
+#            }
+
+#            location = /favicon.ico {
+#                         log_not_found off;
+#                         access_log off;
+#            }
+
+#           location = /robots.txt {
+#                         allow all;
+#                         log_not_found off;
+#                         access_log off;
+#           }
+
+#            location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
+#                         expires max;
+#                         log_not_found off;
+#           }
+#}
+#EOF
+#}
