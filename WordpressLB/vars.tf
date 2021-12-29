@@ -1,32 +1,44 @@
-variable aws_reg {
+variable "aws_reg" {
   description = "This is aws region"
   default     = "us-east-1"
   type        = string
 }
 
-variable stack {
+variable "stack" {
   description = "this is name for tags"
   default     = "terraform"
 }
 
-variable username {
+variable "username" {
   description = "DB username"
 }
 
-variable password {
+variable "password" {
   description = "DB password"
 }
 
-variable dbname {
+variable "dbname" {
   description = "db name"
 }
 
-variable ssh_key {
+variable "ssh_key" {
   default     = "~/.ssh/id_rsa.pub"
   description = "Default pub key"
 }
 
-variable ssh_priv_key {
+variable "ssh_priv_key" {
   default     = "~/.ssh/id_rsa"
   description = "Default private key"
+}
+
+variable "server_port" {
+  description = "The port the web server will be listening"
+  type        = number
+  default     = 8080
+}
+
+variable "elb_port" {
+  description = "The port the elb will be listening"
+  type        = number
+  default     = 80
 }
